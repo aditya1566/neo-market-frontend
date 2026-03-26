@@ -4,8 +4,11 @@ import { ShoppingBag, X, Plus, Minus, Filter, Search, User, LifeBuoy, Mail, Mess
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Checkout from './pages/Checkout';
-import Account from './pages/Account'; // Import the new Account page
+import Account from './pages/Account'; 
 import ProtectedRoute from './components/ProtectedRoute';
+
+// --- ADDED THIS LINE ---
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const ProductCard = ({ product, addToCart }) => (
   <div className="premium-card">
@@ -55,7 +58,6 @@ function Market({ products, cart, addToCart, removeFromCart, totalPrice, showCar
         </div>
 
         <div className="nav-actions">
-          {/* Navigate to Account Page */}
           <button className="nav-icon-btn" onClick={() => navigate('/account')}>
             <User size={20} color={user ? '#6366f1' : 'white'} />
           </button>
@@ -175,13 +177,12 @@ function App() {
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); // New state for Authentication
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const savedCart = localStorage.getItem('neoCart');
     if (savedCart) setCart(JSON.parse(savedCart));
     
-    // Check if user is logged in from a previous session
     const savedUser = localStorage.getItem('neoUser');
     if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
@@ -193,7 +194,8 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/products');
+        // --- UPDATED THIS LINE TO USE API_BASE ---
+        const { data } = await axios.get(`${API_BASE}/api/products`);
         setProducts(data);
         setLoading(false);
       } catch (e) { setLoading(false); }
@@ -241,7 +243,6 @@ function App() {
         <Route path="/account" element={<Account user={user} setUser={setUser} />} />
       </Routes>
     </Router>
-
   );
 }
 
