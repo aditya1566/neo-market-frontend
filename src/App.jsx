@@ -3,11 +3,14 @@ import axios from 'axios';
 import { ShoppingBag, X, Plus, Minus, Filter, Search, User, LifeBuoy, Mail, MessageSquare } from 'lucide-react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+
+// Page Imports
 import Checkout from './pages/Checkout';
 import Account from './pages/Account'; 
+import Payment from './pages/Payment';
+import Success from './pages/Success'; // <--- MUST ADD THIS IMPORT
 import ProtectedRoute from './components/ProtectedRoute';
 
-// --- ADDED THIS LINE ---
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const ProductCard = ({ product, addToCart }) => (
@@ -114,9 +117,12 @@ function Market({ products, cart, addToCart, removeFromCart, totalPrice, showCar
               <label>Category</label>
               <select onChange={(e) => setCategory(e.target.value)} className="neo-select">
                 <option value="All">All Sectors</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Clothing">Apparel</option>
+                <option value="Components">Components</option>
+                <option value="Hardware">Hardware</option>
                 <option value="Cybernetics">Cybernetics</option>
+                <option value="Robotics">Robotics</option>
+                <option value="Optics">Optics</option>
+                <option value="Wearables">Wearables</option>
               </select>
             </div>
             <div className="filter-group">
@@ -194,7 +200,6 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // --- UPDATED THIS LINE TO USE API_BASE ---
         const { data } = await axios.get(`${API_BASE}/api/products`);
         setProducts(data);
         setLoading(false);
@@ -221,6 +226,10 @@ function App() {
     }
   };
 
+  const deleteFromCart = (product) => {
+    setCart(cart.filter((x) => x._id !== product._id));
+  };
+
   const totalPrice = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
 
   return (
@@ -239,8 +248,23 @@ function App() {
             user={user}
           />
         } />
-        <Route path="/checkout" element={<Checkout cart={cart} total={totalPrice} />} />
+
+        <Route path="/checkout" element={
+          <Checkout 
+            cart={cart} 
+            total={totalPrice} 
+            addToCart={addToCart} 
+            removeFromCart={removeFromCart}
+            deleteFromCart={deleteFromCart} 
+          />
+        } />
+
+        <Route path="/payment" element={<Payment total={totalPrice} />} />
+        
         <Route path="/account" element={<Account user={user} setUser={setUser} />} />
+        
+        {/* Pass setCart to Success page to clear the bag */}
+        <Route path="/success" element={<Success setCart={setCart} />} />
       </Routes>
     </Router>
   );
