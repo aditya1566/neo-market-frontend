@@ -10,6 +10,7 @@ import Account from './pages/Account';
 import Payment from './pages/Payment';
 import Success from './pages/Success'; // <--- MUST ADD THIS IMPORT
 import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/Dashboard';
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -265,6 +266,7 @@ function App() {
         
         {/* Pass setCart to Success page to clear the bag */}
         <Route path="/success" element={<Success setCart={setCart} />} />
+        <Route path="/admin" element={<Dashboard />} />
       </Routes>
     </Router>
   );
